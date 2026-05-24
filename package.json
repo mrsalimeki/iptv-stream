@@ -8,14 +8,11 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "cap:add": "npx cap add android",
-    "cap:sync": "npx cap sync",
-    "cap:open": "npx cap open android"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
-    "@capacitor/android": "^8.3.4",
-    "@capacitor/core": "^8.3.4",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
     "@supabase/supabase-js": "^2.57.4",
     "hls.js": "^1.6.16",
     "lucide-react": "^0.344.0",
@@ -23,7 +20,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.3.4",
+    "@capacitor/cli": "^6.0.0",
     "@eslint/js": "^9.9.1",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",

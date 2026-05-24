@@ -38,9 +38,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Add Android platform
-        run: |
-          npm install @capacitor/android@8
-          npx cap add android
+        run: npx cap add android
 
       - name: Build APK
         working-directory: android
