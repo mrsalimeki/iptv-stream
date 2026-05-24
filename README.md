@@ -11,6 +11,7 @@ Watch live TV channels from around the world - Arabic, English, Turkish, Persian
 - Favorites system (localStorage)
 - Responsive design
 - Dark theme
+- Android APK support
 
 ## Setup
 
@@ -23,6 +24,11 @@ npm run dev
 
 # Build for production
 npm run build
+
+# Build Android APK
+npx cap add android
+npx cap sync android
+cd android && ./gradlew assembleDebug
 ```
 
 ## Usage
@@ -38,17 +44,13 @@ npm run build
 - React + TypeScript
 - Tailwind CSS
 - HLS.js for video streaming
+- Capacitor for Android
 - Supabase (optional for cloud sync)
 - IPTV-Org API for channel data
 
-## Environment Variables
+## Download APK
 
-Create a `.env` file with:
-
-```
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+Download the latest APK from [GitHub Actions](https://github.com/mrsalimeki/iptv-stream/actions).
 
 ## License
 
