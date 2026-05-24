@@ -23,15 +23,10 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: |
-          npm install
-          npm list @capacitor/core @capacitor/cli
+        run: npm install
 
       - name: Build web app
         run: npm run build
-
-      - name: List dist folder
-        run: ls -la dist/
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -43,31 +38,19 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Add Android platform
-        run: |
-          echo "Node version: $(node --version)"
-          echo "NPM version: $(npm --version)"
-          npx cap add android --verbose
-        continue-on-error: true
+        run: npx cap add android
 
-      - name: Check android folder
-        run: |
-          ls -la
-          ls -la android/ || echo "Android folder not found"
+      - name: Copy web assets
+        run: npx cap copy android
 
-      - name: Sync Capacitor
-        run: |
-          if [ -d "android" ]; then
-            npx cap sync android
-          else
-            echo "Skipping sync - android folder doesn't exist"
-            exit 1
-          fi
+      - name: Update Android plugins
+        run: npx cap update android
 
       - name: Build APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug -x test --no-daemon --stacktrace
+          ./gradlew assembleDebug -x test --no-daemon
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
