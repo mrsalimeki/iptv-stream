@@ -1,4 +1,4 @@
-import { Heart, Tv2, Signal } from 'lucide-react';
+import { Heart, Tv2, Play } from 'lucide-react';
 import type { Channel } from '../types/iptv';
 
 interface ChannelCardProps {
@@ -10,64 +10,70 @@ interface ChannelCardProps {
 }
 
 const QUALITY_COLORS: Record<string, string> = {
-  '4K': 'bg-amber-500 text-white',
-  '1080p': 'bg-sky-500 text-white',
-  '720p': 'bg-emerald-500 text-white',
-  '480p': 'bg-gray-500 text-white',
-  '360p': 'bg-gray-600 text-white',
-  'HD': 'bg-sky-600 text-white',
-  'SD': 'bg-gray-600 text-white',
+  '4K': 'bg-amber-500 text-white shadow-amber-500/30',
+  '1080p': 'bg-cyan-500 text-white shadow-cyan-500/30',
+  '720p': 'bg-emerald-500 text-white shadow-emerald-500/30',
+  '480p': 'bg-slate-500 text-white',
+  '360p': 'bg-slate-600 text-white',
+  'HD': 'bg-cyan-600 text-white shadow-cyan-500/30',
+  'SD': 'bg-slate-600 text-white',
 };
 
 export default function ChannelCard({ channel, isActive, isFavorite, onSelect, onToggleFavorite }: ChannelCardProps) {
   return (
     <div
-      className={`group relative flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-xl transition-all duration-150 ${
+      className={`group relative flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-xl transition-all duration-200 ${
         isActive
-          ? 'bg-sky-600/20 border border-sky-500/40'
-          : 'hover:bg-white/5 border border-transparent hover:border-white/10'
+          ? 'bg-cyan-600/15 border border-cyan-500/50 shadow-lg shadow-cyan-500/10'
+          : 'hover:bg-slate-800/60 border border-transparent hover:border-slate-700'
       }`}
       onClick={() => onSelect(channel)}
     >
-      {/* Logo / placeholder */}
-      <div className="relative flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center">
+      <div className={`relative flex-shrink-0 w-11 h-11 rounded-xl overflow-hidden flex items-center justify-center transition-all ${
+        isActive ? 'bg-cyan-600/30 ring-2 ring-cyan-500/50' : 'bg-slate-800'
+      }`}>
         {channel.logo ? (
           <img
             src={channel.logo}
             alt={channel.name}
-            className="w-full h-full object-contain p-0.5"
+            className="w-full h-full object-contain p-1"
             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
         ) : (
-          <Tv2 className="w-5 h-5 text-gray-500" />
+          <Tv2 className="w-5 h-5 text-slate-500" />
         )}
         {isActive && (
-          <div className="absolute inset-0 bg-sky-500/10 flex items-center justify-center">
-            <Signal className="w-3 h-3 text-sky-400 animate-pulse" />
+          <div className="absolute inset-0 bg-cyan-500/20 flex items-center justify-center">
+            <Play className="w-4 h-4 text-cyan-400 fill-cyan-400" />
           </div>
         )}
       </div>
 
-      {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className={`text-sm font-medium truncate leading-tight ${isActive ? 'text-sky-300' : 'text-gray-200'}`}>
+        <p className={`text-sm font-medium truncate leading-tight transition-colors ${
+          isActive ? 'text-cyan-300' : 'text-slate-200 group-hover:text-white'
+        }`}>
           {channel.name}
         </p>
-        <p className="text-xs text-gray-500 truncate mt-0.5">{channel.category}</p>
+        <p className="text-xs text-slate-500 truncate mt-0.5">{channel.category}</p>
       </div>
 
-      {/* Quality badge + favorite */}
-      <div className="flex items-center gap-1.5 flex-shrink-0">
+      <div className="flex items-center gap-2 flex-shrink-0">
         {channel.quality && (
-          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${QUALITY_COLORS[channel.quality] || 'bg-gray-700 text-gray-300'}`}>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm ${QUALITY_COLORS[channel.quality] || 'bg-slate-700 text-slate-300'}`}>
             {channel.quality}
           </span>
         )}
         <button
           onClick={e => { e.stopPropagation(); onToggleFavorite(channel); }}
-          className={`opacity-0 group-hover:opacity-100 transition-all duration-150 p-1 rounded-full hover:bg-white/10 ${isFavorite ? '!opacity-100 text-red-400' : 'text-gray-500 hover:text-red-400'}`}
+          className={`transition-all duration-200 p-1.5 rounded-lg ${
+            isFavorite
+              ? 'bg-rose-500/20 text-rose-400 hover:bg-rose-500/30'
+              : 'opacity-0 group-hover:opacity-100 text-slate-500 hover:text-rose-400 hover:bg-slate-700'
+          }`}
+          title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
         >
-          <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
+          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
         </button>
       </div>
     </div>

@@ -1,19 +1,31 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Channel } from '../types/iptv';
 
-const STORAGE_KEY = 'iptv_favorites';
+const STORAGE_KEY = 'iptv_favorites_v2';
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<Channel[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    } catch {
-      return [];
-    }
-  });
+  const [favorites, setFavorites] = useState<Channel[]>([]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setFavorites(parsed);
+        }
+      }
+    } catch {
+      setFavorites([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (favorites.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
   }, [favorites]);
 
   const isFavorite = useCallback(
@@ -29,5 +41,10 @@ export function useFavorites() {
     );
   }, []);
 
-  return { favorites, isFavorite, toggleFavorite };
+  const clearAllFavorites = useCallback(() => {
+    setFavorites([]);
+    localStorage.removeItem(STORAGE_KEY);
+  }, []);
+
+  return { favorites, isFavorite, toggleFavorite, clearAllFavorites };
 }
