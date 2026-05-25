@@ -2,8 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import Hls from 'hls.js';
 import {
   Play, Pause, Volume2, VolumeX, Maximize, Minimize,
-  RotateCcw, Settings, RefreshCw, Monitor, Smartphone,
-  AlertCircle, Loader2
+  RotateCcw, Settings, RefreshCw, Monitor, AlertCircle, Loader2
 } from 'lucide-react';
 import type { Channel, Quality } from '../types/iptv';
 
@@ -24,7 +23,6 @@ export default function VideoPlayer({ channel, onClose }: VideoPlayerProps) {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isPortrait, setIsPortrait] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showControls, setShowControls] = useState(true);
@@ -214,22 +212,10 @@ export default function VideoPlayer({ channel, onClose }: VideoPlayerProps) {
     try {
       if (!document.fullscreenElement) {
         await containerRef.current.requestFullscreen();
-        if (screen.orientation && 'lock' in screen.orientation) {
-          try {
-            await (screen.orientation as any).lock(isPortrait ? 'portrait' : 'landscape');
-          } catch {}
-        }
       } else {
         await document.exitFullscreen();
-        if (screen.orientation && 'unlock' in screen.orientation) {
-          (screen.orientation as any).unlock();
-        }
       }
     } catch {}
-  };
-
-  const toggleOrientation = () => {
-    setIsPortrait(p => !p);
   };
 
   const handleRetry = () => {
@@ -257,7 +243,7 @@ export default function VideoPlayer({ channel, onClose }: VideoPlayerProps) {
 
   if (!channel) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-slate-950 text-slate-400 select-none">
+      <div className="flex flex-col items-center justify-center h-full w-full bg-slate-950 text-slate-400 select-none">
         <Monitor className="w-20 h-20 mb-4 opacity-30" />
         <p className="text-xl font-medium opacity-50">Select a channel to watch</p>
         <p className="text-sm text-slate-600 mt-2">Choose from the sidebar</p>
@@ -268,7 +254,7 @@ export default function VideoPlayer({ channel, onClose }: VideoPlayerProps) {
   return (
     <div
       ref={containerRef}
-      className={`relative bg-black overflow-hidden group ${isPortrait ? 'aspect-[9/16]' : 'aspect-video'} w-full h-full`}
+      className="relative bg-black overflow-hidden group w-full h-full aspect-video"
       onMouseMove={resetControlsTimer}
       onClick={resetControlsTimer}
     >
@@ -291,7 +277,7 @@ export default function VideoPlayer({ channel, onClose }: VideoPlayerProps) {
       {error && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm gap-4">
           <AlertCircle className="w-14 h-14 text-red-400" />
-          <p className="text-white text-base font-medium">{error}</p>
+          <p className="text-white text-base font-medium text-center px-4">{error}</p>
           <div className="flex gap-3">
             <button
               onClick={handleRetry}
@@ -388,14 +374,6 @@ export default function VideoPlayer({ channel, onClose }: VideoPlayerProps) {
               <RotateCcw className="w-5 h-5" />
             </button>
 
-            <button
-              onClick={toggleOrientation}
-              className={`transition-colors p-2 rounded-lg ${isPortrait ? 'bg-cyan-600 text-white' : 'bg-black/30 text-white/70 hover:text-white hover:bg-black/50'}`}
-              title={isPortrait ? 'Landscape mode' : 'Portrait mode (full screen on phone)'}
-            >
-              {isPortrait ? <Monitor className="w-5 h-5" /> : <Smartphone className="w-5 h-5" />}
-            </button>
-
             <div className="relative">
               <button
                 onClick={() => setShowQualityMenu(p => !p)}
@@ -423,7 +401,7 @@ export default function VideoPlayer({ channel, onClose }: VideoPlayerProps) {
               onClick={toggleFullscreen}
               className="text-white/70 hover:text-white transition-colors bg-black/30 p-2 rounded-lg hover:bg-black/50"
             >
-              {isFullscreen ? <Minimize className="w-5 h-5" /> : <maximize className="w-5 h-5" />}
+              {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
             </button>
           </div>
         </div>
