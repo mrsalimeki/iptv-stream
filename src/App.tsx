@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { RefreshCw, Tv2, Search, Heart, Globe, ChevronLeft, ChevronRight, Wifi, WifiOff, Clock } from 'lucide-react';
+import { RefreshCw, Tv2, Search, Heart, Globe, ChevronLeft, ChevronRight, Wifi, WifiOff, Menu, X } from 'lucide-react';
 import VideoPlayer from './components/VideoPlayer';
 import ChannelCard from './components/ChannelCard';
 import SourceSelector from './components/SourceSelector';
@@ -19,7 +19,7 @@ interface Filters {
 export default function App() {
   const [currentFilter, setCurrentFilter] = useState(DEFAULT_FILTER);
   const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<Filters>({
     search: '', country: '', showFavorites: false,
@@ -68,18 +68,25 @@ export default function App() {
     d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100">
+    <div className="flex h-screen bg-slate-950 text-slate-100">
       <aside
-        className={`flex flex-col flex-shrink-0 bg-slate-950/95 backdrop-blur border-r border-cyan-500/20 transition-all duration-300 ${
-          sidebarOpen ? 'w-72' : 'w-0 overflow-hidden'
+        className={`fixed md:static inset-y-0 left-0 flex flex-col flex-shrink-0 w-72 bg-gradient-to-b from-slate-900 to-slate-950 border-r border-cyan-500/20 transition-transform duration-300 z-30 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
+        <button
+          onClick={() => setSidebarOpen(false)}
+          className="md:hidden absolute top-4 right-4 p-2 hover:bg-slate-800 rounded-lg text-slate-400"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
         <div className="p-4 border-b border-cyan-500/20 flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
               <Tv2 className="w-5 h-5 text-white" />
             </div>
-            <div>
+            <div className="flex-1">
               <h1 className="text-lg font-bold text-white">IPTV Stream</h1>
               <p className="text-xs text-cyan-400/80">{channels.length.toLocaleString()} channels</p>
             </div>
@@ -114,7 +121,7 @@ export default function App() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search channels..."
               value={filters.search}
               onChange={e => handleFiltersChange({ ...filters, search: e.target.value })}
               className="w-full bg-slate-800/50 border border-cyan-500/30 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30 transition-all"
@@ -171,7 +178,10 @@ export default function App() {
                   channel={ch}
                   isActive={activeChannel?.id === ch.id}
                   isFavorite={isFavorite(ch.id)}
-                  onSelect={setActiveChannel}
+                  onSelect={() => {
+                    setActiveChannel(ch);
+                    if (window.innerWidth < 768) setSidebarOpen(false);
+                  }}
                   onToggleFavorite={toggleFavorite}
                 />
               ))}
@@ -211,16 +221,23 @@ export default function App() {
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col min-w-0 relative">
+      {sidebarOpen && window.innerWidth < 768 && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <main className="flex-1 flex flex-col min-w-0 relative bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900">
         <button
-          onClick={() => setSidebarOpen(p => !p)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-6 h-12 bg-gradient-to-r from-slate-900/80 to-slate-900/40 hover:from-cyan-600/50 hover:to-cyan-600/30 border-l-2 border-cyan-500/30 hover:border-cyan-500 rounded-r-lg flex items-center justify-center text-slate-400 hover:text-cyan-300 transition-all"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="md:hidden absolute top-4 left-4 z-10 p-2 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-slate-300 hover:text-cyan-300 transition-all border border-cyan-500/20"
         >
-          {sidebarOpen ? <ChevronLeft className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+          <Menu className="w-5 h-5" />
         </button>
 
-        <div className="flex-1 flex flex-col min-h-0 bg-black">
-          <div className="flex-1 w-full">
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 w-full bg-black">
             <VideoPlayer channel={activeChannel} />
           </div>
 
